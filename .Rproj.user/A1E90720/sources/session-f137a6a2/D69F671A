@@ -1,0 +1,26 @@
+{
+    "id": "D69F671A",
+    "path": "C:/Users/Benet/Projects/Rpackages/bendr/R/utils.R",
+    "project_path": "R/utils.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1678566685855.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "225,0",
+        "scrollLine": "0"
+    },
+    "folds": "21|39|52|0|\n57|75|79|0|\n95|50|120|0|\n130|36|136|0|\n148|61|171|0|\n182|66|196|0|\n212|56|224|0|\n254|59|264|0|\n273|10|283|0|\n294|49|321|0|\n328|10|365|0|\n",
+    "lastKnownWriteTime": 1691327986,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1691327986563,
+    "read_only": false,
+    "read_only_alternatives": []
+}
