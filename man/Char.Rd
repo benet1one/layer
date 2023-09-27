@@ -13,5 +13,5 @@ Char(..., .split = "; ")
 }
 \description{
 Uses a split to separate elements without having to open and close
-"" every time. Use \\ before to
+"" every time. Use \\ before the split to ignore it.
 }

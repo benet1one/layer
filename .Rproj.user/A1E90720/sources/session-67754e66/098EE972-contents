@@ -1,4 +1,10 @@
 
+#' Alias for paste(string, collapse = "")
+#' @export
+collapse <- function(string, sep = "") {
+    paste(string, collapse = sep)
+}
+
 #' @export
 `%!in%` <- function(e1, set) {
     !is.element(e1, set)
@@ -49,7 +55,6 @@ catln <- function(..., sep = "") {
 #' Uses non named arguments as colors and named arguments are passed on to
 #' \link{colorRamp}
 #' @seealso \link{colorRamp}
-#' @export
 gradient_n <- function(...) {
     dots <- list(...)
     named <- names(dots) != ""
@@ -62,20 +67,24 @@ gradient_n <- function(...) {
 #' Comfortable character vectors
 #' @description
 #' Uses a split to separate elements without having to open and close
-#' "" every time. Use \\ before to
+#' "" every time. Use \\ before the split to ignore it.
 #'
 #' @param ... Anything that can be coerced to character
 #' @param .split Where to split individual strings.
 #'
 #' @export
 Char <- function(..., .split = "; ") {
-    .only_split <- paste0("[^\\]", .split)
+
+    string <- collapse(c(...))
+
+    .only_split <- paste0("[^\\\\]", .split)
     .remove <- paste0("\\\\", .split)
 
-    list(...) %>%
-        lapply(as.character) %>%
-        lapply(strsplit, split = .only_split) %>%
-        unlist() %>%
+    pos <- gregexpr(.only_split, string)[[1]] %>%
+        c(pos + nchar(.split))
+
+    str_split_index(string, pos) %>%
+        odds() %>%
         gsub(pattern = .remove, replacement = .split)
 }
 
@@ -234,6 +243,15 @@ list_to_function <- function(fun_list, simplify = TRUE) {
         sapply(fun_list, \(f) do.call(f, list(x)), simplify = simplify)
     }
 }
+
+
+#' Keep even or odd indexes of a vector.
+#' @export
+evens <- function(x)  x[seq(2L, length(x), 2L)]
+
+#' @export
+#' @rdname evens
+odds <- function(x)  x[seq(1L, length(x), 2L)]
 
 
 

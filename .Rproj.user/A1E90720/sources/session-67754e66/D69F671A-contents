@@ -150,18 +150,16 @@ str_split_keep <- function(string, pattern, where = "left") {
 
     require(stringr)
     fix <- switch(where,
-        "left" = function(x) {
-            x[, 2]
-        },
-        "right" = function(x) {
-            x[, 1] - 1
-        },
+        "left" = \(x)  x[, 2L],
+        "right" = \(x) x[, 1L] - 1L,
         "middle" = function(x) {
-            x[, 1] %<>% subtract(1)
+            x[, 1L] %<>% subtract(1L)
             c(t(x))
         },
-        stop("{where} must be 'left','right' or middle")
+        stop("{where} must be 'left', 'right' or 'middle'")
     )
+
+    browser()
     pos <- str_locate_all(string, pattern) %>% lapply(fix)
 
     mapply(string, pos, SIMPLIFY = FALSE, FUN = function(str, p) {
@@ -170,6 +168,37 @@ str_split_keep <- function(string, pattern, where = "left") {
         str_sub(str, pstart, pend)
     })
 }
+
+#' Split strings by the character index
+#'
+#' @param string String to be split.
+#' @param index Index at which to split.
+#' @param where Where to insert the character at the indexes. Possible values
+#' are 'left', 'right', 'middle', and 'remove'.
+#'
+#' @return The split string as a vector.
+#' @export
+#'
+#' @examples
+str_split_index <- function(string, index, where = "left") {
+
+    require(stringr)
+    switch(where,
+        "left"   = NULL,
+        "right"  = index %<>% add(-1L),
+        "middle" = index %<>% c(index - 1L),
+        "remove" = index %<>% c(index - 1L),
+        stop("{where} must be 'left', 'right', 'middle' or 'remove'")
+    )
+
+    index %<>% sort()
+
+    pstart <- c(1L, index + 1L)
+    pend   <- c(index, nchar(string))
+    substring(string, pstart, pend) %>%
+        pipe_if(where == "remove", odds)
+}
+
 
 #' Replace matches in a string with a transformed match.
 #'
@@ -366,6 +395,11 @@ matrix_byrow <- function(..., .fill, .nrow, .ncol) {
     my_matrix
 }
 
+
+outer_n <- function(fun, args1, args2) {
+
+
+}
 
 
 

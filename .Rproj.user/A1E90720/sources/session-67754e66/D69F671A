@@ -3,7 +3,7 @@
     "path": "C:/Users/Benet/Projects/Rpackages/bendr/R/utils.R",
     "project_path": "R/utils.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "3199704139",
     "contents": "",
     "dirty": false,
     "created": 1678566685855.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "225,0",
-        "scrollLine": "0"
+        "cursorPosition": "181,12",
+        "scrollLine": "164"
     },
-    "folds": "21|39|52|0|\n57|75|79|0|\n95|50|120|0|\n130|36|136|0|\n148|61|171|0|\n182|66|196|0|\n212|56|224|0|\n254|59|264|0|\n273|10|283|0|\n294|49|321|0|\n328|10|365|0|\n",
-    "lastKnownWriteTime": 1691327986,
+    "folds": "",
+    "lastKnownWriteTime": 1695835401,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1691327986563,
+    "last_content_update": 1695835401359,
     "read_only": false,
     "read_only_alternatives": []
 }

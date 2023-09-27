@@ -25,5 +25,4 @@ funs <- list(
 
 my_fun <- list_to_function(funs)
 my_fun(1:5)
-
 }
