@@ -143,9 +143,6 @@ pipe_if <- function(.data, .condition, .if, .else = .data) {
 }
 
 #' Call "return" from another function's execution environment.
-#' @description
-#' By, default, evaluates in
-#'
 #'
 #' @param x Object to return.
 #' @param n Number of generations to go back. By default, it
@@ -254,4 +251,22 @@ evens <- function(x)  x[seq(2L, length(x), 2L)]
 odds <- function(x)  x[seq(1L, length(x), 2L)]
 
 
+#' Wrap a number between a minimum and a maximum, as understood in Blender
+#'
+#' @description
+#' Simply calculates  \code{min + (x - min) \%\% (max - min)}
+#'
+#' @param x Number to wrap.
+#' @param min Minimum, inclusive.
+#' @param max Maximum, not inclusive.
+#'
+#' @details
+#' When wrapping integers, it is sometimes useful for the Maximum to be
+#' inclusive, instead of the Minimum.
+#' To achieve this, just add +0.1 to both Minimum and Maximum.
+#'
+#' @export
+wrap <- function(x, min, max) {
+    min + (x - min) %% (max - min)
+}
 

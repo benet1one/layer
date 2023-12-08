@@ -12,6 +12,8 @@ with a flexible syntax.}
 
 \item{format}{Format to use. See \link{details}.}
 
+\item{digits}{Number of digits to add to \code{\%S}.}
+
 \item{...}{Ignored.}
 }
 \value{

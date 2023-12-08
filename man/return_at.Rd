@@ -20,7 +20,7 @@ executed. When specified, 'n' is ignored.}
 Invisibly returns 'x'
 }
 \description{
-By, default, evaluates in
+Call "return" from another function's execution environment.
 }
 \examples{
 f <- function() {
