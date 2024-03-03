@@ -178,8 +178,6 @@ str_split_keep <- function(string, pattern, where = "left") {
 #'
 #' @return The split string as a vector.
 #' @export
-#'
-#' @examples
 str_split_index <- function(string, index, where = "left") {
 
     require(stringr)

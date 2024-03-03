@@ -46,7 +46,7 @@ print.tempo <- function(x) print(format.tempo(x), quote = FALSE)
 #'
 #' @param x A tempo object.
 #' @param format Format to use. See \link{details}.
-#' @param digits Number of digits to add to \code{%S}.
+#' @param digits Number of digits to add to \code{\%S}.
 #' @param ... Ignored.
 #'
 #' @return A formatted character vector.

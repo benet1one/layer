@@ -2,12 +2,13 @@
 % Please edit documentation in R/shorts.R
 \name{wrap}
 \alias{wrap}
-\title{Wrap a number between a minimum and a maximum, as understood in Blender}
+\title{Wrap a numeric vector between a minimum and a maximum,
+as understood in Blender}
 \usage{
 wrap(x, min, max)
 }
 \arguments{
-\item{x}{Number to wrap.}
+\item{x}{Numbers to wrap.}
 
 \item{min}{Minimum, inclusive.}
 

@@ -251,12 +251,13 @@ evens <- function(x)  x[seq(2L, length(x), 2L)]
 odds <- function(x)  x[seq(1L, length(x), 2L)]
 
 
-#' Wrap a number between a minimum and a maximum, as understood in Blender
+#' Wrap a numeric vector between a minimum and a maximum,
+#' as understood in Blender
 #'
 #' @description
 #' Simply calculates  \code{min + (x - min) \%\% (max - min)}
 #'
-#' @param x Number to wrap.
+#' @param x Numbers to wrap.
 #' @param min Minimum, inclusive.
 #' @param max Maximum, not inclusive.
 #'
@@ -268,5 +269,39 @@ odds <- function(x)  x[seq(1L, length(x), 2L)]
 #' @export
 wrap <- function(x, min, max) {
     min + (x - min) %% (max - min)
+}
+
+
+#' Map a numeric vector from one range to another
+#'
+#'
+#' @param x Numbers to map.
+#' @param from Range to map from.
+#' @param to Range to map to.
+#' @param clamp Whether to force numbers within the range.
+#'
+#' @return A vector of the same length, with numbers
+#' @export
+#'
+#' @examples
+#' map_range((1:10)^2, to = 2:8) %>% barplot()
+#' map_range((1:10)^2, from = 0:50, to = 2:8, clamp = TRUE) %>% barplot()
+map_range <- function(x, from = range(x), to = 0:1, clamp = FALSE) {
+
+    if (length(from) == 2L  &&  length(to) == 2L) {
+        norm_x <- (x - from[1L]) / (from[2L] - from[1L])
+        y <- norm_x * (to[2L] - to[1L]) + to[1L]
+
+    } else {
+        norm_x <- (x - min(from)) / (max(from) - min(from))
+        y <- norm_x * (max(to) - min(to)) + min(to)
+    }
+
+    if (clamp) {
+        y <- pmax(y, min(to))
+        y <- pmin(y, max(to))
+    }
+
+    y
 }
 
