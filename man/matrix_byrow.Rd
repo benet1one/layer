@@ -9,3 +9,6 @@ matrix_byrow(..., .fill, .nrow, .ncol)
 \description{
 Supports ',,' for row breaks.
 }
+\seealso{
+[tibble::frame_matrix()]
+}

@@ -352,7 +352,7 @@ expand_grid <- function(..., KEEP.OUT.ATTRS = TRUE, stringsAsFactors = TRUE) {
 #' Convinient matrix definition.
 #' @description
 #' Supports ',,' for row breaks.
-#'
+#' @seealso [tibble::frame_matrix()]
 #' @export
 matrix_byrow <- function(..., .fill, .nrow, .ncol) {
 
@@ -394,12 +394,81 @@ matrix_byrow <- function(..., .fill, .nrow, .ncol) {
 }
 
 
-outer_n <- function(fun, args1, args2) {
+#' Make a list of functions
+#'
+#' @rdname function_list
+#' @param ... Calls.
+#' @param .args Arguments shared by all functions.
+#'
+#' @return List of functions.
+#' @export
+#'
+#' @examples
+#' my_functions <- function_list(
+#'     .args = c("x", "y"),
+#'     x + mean(y) / z,
+#'     x^2 + sd(y) / z^2,
+#'     sqrt(x) + y + z
+#' )
+#'
+#' # Is equivalent to
+#' my_calls <- alist(
+#'     x + mean(y) / z,
+#'     x^2 + sd(y) / z^2,
+#'     sqrt(x) + y + z
+#' )
+#' my_functions <- calls_to_functions(my_calls, c("x", "y"))
+#'
+#' # Is equivalent to
+#' my_functions <- list(
+#'     \(x, y) x + mean(y) / z,
+#'     \(x, y) x^2 + sd(y) / z^2,
+#'     \(x, y) sqrt(x) + y + z
+#' )
+function_list <- function(..., .args) {
 
+    require(rlang)
 
+    exprs <- enexprs(...)
+    calls_to_functions(exprs, maybe_missing(.args))
 }
 
+#' @rdname function_list
+#' @param exprs List of calls.
+#' @param .args Arguments shared by all functions.
+#' @export
+calls_to_functions <- function(exprs, .args) {
+
+    if (missing(.args))
+        .args <- all.vars(exprs)
+
+    .args <- rep(alist(name = ), length(.args)) %>%
+        set_names(.args)
+
+    fun_list <- vector("list", length(exprs))
+
+    for (k in seq_along(exprs)) {
+        function_form <- append(.args, exprs[[k]])
+        fun_list[[k]] <- as.function(function_form)
+    }
+
+    names(fun_list) <- names(exprs)
+    fun_list
+}
+# calls_to_functions <- Vectorize(calls_to_functions, "exprs")
 
 
+my_calls <- alist(
+    x + mean(y) / z,
+    x^2 + sd(y) / z^2,
+    sqrt(x) + y + z
+)
+my_functions <- calls_to_functions(my_calls, c("x", "y"))
 
 
+function_list(
+    .args = c("x", "y"),
+    x + mean(y) / z,
+    x^2 + sd(y) / z^2,
+    sqrt(x) + y + z
+)
