@@ -198,7 +198,9 @@ factor <- function(x, levels = unique(x), labels = levels,
 #' @return A list environment, with expression executed.
 #' @export
 within_list <- function(expr) {
-    within.list(list(), expr)
+    expr <- substitute(expr)
+    expr <- substituteDirect(expr, parent.frame())
+    within.list(list(), eval(expr))
 }
 
 
@@ -305,3 +307,28 @@ map_range <- function(x, from = range(x), to = 0:1, clamp = FALSE) {
     y
 }
 
+
+#' Perform set operations elegantly.
+#' @description
+#' Use \code{|} for set unions, \code{&} for intersection, and \code{~} for
+#' difference.
+#' 
+#' @param expr Expression
+#'
+#' @return A set.
+#' @export
+#'
+#' @examples
+#' A <- 1:10
+#' B <- 5:12
+#' C <- 2:3
+#' set(A | B ~ C)
+set <- function(expr) {
+    `&` <- `&&` <- intersect
+    `|` <- `||` <- union
+    `~` <- setdiff
+
+    expr2 <- substitute(expr)
+    expr3 <- substituteDirect(expr2, parent.frame())
+    eval(expr3)
+}
