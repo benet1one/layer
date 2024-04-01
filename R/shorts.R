@@ -332,3 +332,29 @@ set <- function(expr) {
     expr3 <- substituteDirect(expr2, parent.frame())
     eval(expr3)
 }
+
+
+#' Array indices to single indices.
+#' @description
+#' The inverse of \link{arrayInd}
+#' 
+#' @param ind Matrix with n columns, where n is the number of dimensions.
+#' @param arr Optional. Array to use. Only extracts dimensions.
+#' @param .dim Dimensions of the array.
+#'
+#' @return Integer vector with the single indices for the array.
+#' @export
+#'
+#' @examples
+#' si <- c(1, 4, 7, 16)
+#' my_ind <- arrayInd(si, .dim = c(4, 6))
+#' single_ind(my_ind, .dim = c(4, 6))
+single_ind <- function(ind, arr, .dim = dim(arr)) {
+    
+    stopifnot(ncol(ind) == length(.dim))
+    
+    ind_array <- array(1:prod(.dim), dim = .dim)
+    apply(ind, 1L, \(x) { 
+        do.call(what = "[", args = append(list(ind_array), x))
+    })
+}

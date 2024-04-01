@@ -15,5 +15,5 @@ Usefull for probabilities
 \examples{
 m <- matrix(runif(36), 6, 6) \%>\% percent()
 print(m)
-format(m, digits = 3L)
+format(m, digits = 2L)
 }

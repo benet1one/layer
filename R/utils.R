@@ -456,19 +456,3 @@ calls_to_functions <- function(exprs, .args) {
     fun_list
 }
 # calls_to_functions <- Vectorize(calls_to_functions, "exprs")
-
-
-my_calls <- alist(
-    x + mean(y) / z,
-    x^2 + sd(y) / z^2,
-    sqrt(x) + y + z
-)
-my_functions <- calls_to_functions(my_calls, c("x", "y"))
-
-
-function_list(
-    .args = c("x", "y"),
-    x + mean(y) / z,
-    x^2 + sd(y) / z^2,
-    sqrt(x) + y + z
-)
