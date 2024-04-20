@@ -81,7 +81,7 @@ Char <- function(..., .split = "; ") {
     .remove <- paste0("\\\\", .split)
 
     pos <- gregexpr(.only_split, string)[[1]] %>%
-        c(pos + nchar(.split))
+        c(. + nchar(.split))
 
     str_split_index(string, pos) %>%
         odds() %>%
