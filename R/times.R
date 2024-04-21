@@ -38,8 +38,10 @@ tempo <- list(
     in_seconds = function(x) unclass(x)
 )
 
+#' @exportS3Method
 as.numeric.tempo <- function(x) unclass(x)
-print.tempo <- function(x) print(format.tempo(x), quote = FALSE)
+#' @exportS3Method 
+print.tempo <- function(x) print(paste0(format.tempo(x), " "), quote = FALSE)
 
 #' Format a tempo object.
 #' with a flexible syntax.
@@ -50,8 +52,8 @@ print.tempo <- function(x) print(format.tempo(x), quote = FALSE)
 #' @param ... Ignored.
 #'
 #' @return A formatted character vector.
-#' @export
-#'
+#' @exportS3Method
+#' 
 #' @details
 #'
 #' Argument \code{format} must be specified as follows:
@@ -63,20 +65,11 @@ print.tempo <- function(x) print(format.tempo(x), quote = FALSE)
 #' \code{\%m}  Total Minutes with decimals. Can exceed 60.
 #' \code{\%s}  Total Seconds with decimals. Can exceed 60.
 #'
-#'
-#' The number after is the minimum width of the string,
-#' with the left part filled with zeros.
-#'
-#' Must be between 1 and 9. If not specified it's 2 by default.
-#' It can be escaped using \\.
-#'
-#'
-#'
 #' @examples
 #'
 #' my_tempo <- Tempo(3735)
 #' format(my_tempo)
-#' format(my_tempo, "%H6, %M4, %S4")
+#' format(my_tempo, "%H, %M, %S")
 #' format(my_tempo, "It's been %m minutes")
 format.tempo <- function(x, format = "%H:%M:%S", digits = 3, ...) {
 
@@ -84,24 +77,16 @@ format.tempo <- function(x, format = "%H:%M:%S", digits = 3, ...) {
         dec <- (tempo$in_seconds(x) %% 1) %>%
             format(digits = digits, nsmall = digits) %>%
             substring(2L, 2L + digits)
-        format <- gsub("%S", paste0("%S", dec), format)
+        format <- stringr::str_replace(format, "%S", paste0("%S", dec))
     }
 
-    positions <- gregexec("%[HMShms][0-9]?", format)[[1]]
-    no_width <- attr(positions, "match.length", exact = TRUE) == 2
-
-    positions <- as.integer(positions)
-    no_width <- as.logical(no_width)
-
+    positions <- gregexec("%[HMShms]", format)[[1]] %>% as.integer()
     letters <- substring(format, positions + 1L, positions + 1L)
-    widths  <- substring(format, positions + 2L, positions + 2L)
-    widths[no_width] <- "2"
-    widths <- as.integer(widths)
 
     calculated <- numeric(6) %>% set_names(c("H", "M", "S", "h", "m", "s"))
     to_calculate <- match(unique(letters), names(calculated))
 
-    sapply(x, function(y) {
+    mapply(x, format, FUN = function(y, f) {
 
         for (i in to_calculate) {
             calculated[i] <- tempo[[i]](y)
@@ -109,8 +94,8 @@ format.tempo <- function(x, format = "%H:%M:%S", digits = 3, ...) {
 
         values <- calculated[match(letters, names(calculated))]
 
-        replacements <- mapply(formatC, x = values, width = widths, flag = "0")
-        str_replace_vectorized(string = format, pattern = "%[HMShms][0-9]?",
+        replacements <- mapply(formatC, x = values, width = 2, flag = "0")
+        str_replace_vectorized(string = f, pattern = "%[HMShms]",
                                replacements = replacements)
     })
 }

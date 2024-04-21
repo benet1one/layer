@@ -32,18 +32,11 @@ Argument \code{format} must be specified as follows:
 \code{\%h}  Hours with decimals. Can exceed 24.
 \code{\%m}  Total Minutes with decimals. Can exceed 60.
 \code{\%s}  Total Seconds with decimals. Can exceed 60.
-
-
-The number after is the minimum width of the string,
-with the left part filled with zeros.
-
-Must be between 1 and 9. If not specified it's 2 by default.
-It can be escaped using \\.
 }
 \examples{
 
 my_tempo <- Tempo(3735)
 format(my_tempo)
-format(my_tempo, "\%H6, \%M4, \%S4")
+format(my_tempo, "\%H, \%M, \%S")
 format(my_tempo, "It's been \%m minutes")
 }
