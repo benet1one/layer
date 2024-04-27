@@ -45,3 +45,6 @@ my_functions <- list(
     \(x, y) sqrt(x) + y + z
 )
 }
+\seealso{
+[list_to_function()]
+}

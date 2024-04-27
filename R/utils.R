@@ -314,7 +314,6 @@ rev_array <- function(x, margin = 1) {
 #' Expand Grid with repeating support.
 #'
 #' @param ... Vectors or lists. Use "x \%^\% n" to have "n" columns for the vector "x"
-#' @export
 #'
 #' @seealso See \link{expand.grid}, the base version of the function, in which this
 #' one relies on.
@@ -353,7 +352,6 @@ expand_grid <- function(..., KEEP.OUT.ATTRS = TRUE, stringsAsFactors = TRUE) {
 #' @description
 #' Supports ',,' for row breaks.
 #' @seealso [tibble::frame_matrix()]
-#' @export
 matrix_byrow <- function(..., .fill, .nrow, .ncol) {
 
     require(rlang)
@@ -402,6 +400,7 @@ matrix_byrow <- function(..., .fill, .nrow, .ncol) {
 #'
 #' @return List of functions.
 #' @export
+#' @seealso [list_to_function()]
 #'
 #' @examples
 #' my_functions <- function_list(
@@ -456,3 +455,65 @@ calls_to_functions <- function(exprs, .args) {
     fun_list
 }
 # calls_to_functions <- Vectorize(calls_to_functions, "exprs")
+
+
+#' Convert a list of functions to a single function.
+#' @description
+#' Useful for writing clean code.
+#' @param fun_list A list of functions.
+#' @return A single function that applies all the functions in the list to
+#' it's argument \code{x}.
+#' @export
+#' @seealso [function_list()]
+#'
+#' @examples
+#' funs <- list(
+#'     f1 = \(x) x + 1,
+#'     f2 = \(x) x*4,
+#'     f3 = \(x) x^2
+#' )
+#'
+#' my_fun <- list_to_function(funs)
+#' my_fun(1:5)
+list_to_function <- function(fun_list, simplify = TRUE) {
+    
+    if (missing(fun_list))
+        stop("Missing fun_list")
+    
+    function(x) {
+        sapply(fun_list, \(f) do.call(f, list(x)), simplify = simplify)
+    }
+}
+
+
+#' Negate values to make a pyramid plot.
+#'
+#' @param .data Data frame or tibble.
+#' @param values Columns with the values to negate.
+#' @param by Column, preferably a factor, to negate values by.
+#' @param level Level in the factor to have it's values negated.
+#'
+#' @return An object of the same class as .data 
+#' @export
+pyramid <- function(.data, values, by, level = fact[1L]) {
+    
+    require(rlang)
+    require(tidyselect)
+    
+    value_cols <- eval_select(enquo(values), data = .data)
+    by_col <- eval_select(enquo(by), data = .data)
+    
+    fact <- .data[[ by_col ]]
+    neg <- fact == level
+    
+    for (v in value_cols) {
+        if (!is.numeric(.data[[ v ]])) {
+            warning("Columns in 'values' must be numeric")
+            next
+        }
+        .data[neg, v] <- -.data[neg, v]
+    }
+    
+    .data
+}
+

@@ -209,40 +209,12 @@ within_list <- function(expr) {
 #' When x is a length 1 integer, it won't use sample.int. See
 #' the base definition of sample.
 #' @export
-#' @seealso \link{sample.int}
+#' @seealso [sample.int()]
 sample <- function (x, size, replace = FALSE, prob = NULL) {
     if (missing(size))
         size <- length(x)
     x[sample.int(length(x), size, replace, prob)]
 }
-
-#' Convert a list of functions to a single function.
-#' @description
-#' Useful for writing clean code.
-#' @param fun_list A list of functions.
-#' @return A single function that applies all the functions in the list to
-#' it's argument \code{x}.
-#' @export
-#'
-#' @examples
-#' funs <- list(
-#'     f1 = \(x) x + 1,
-#'     f2 = \(x) x*4,
-#'     f3 = \(x) x^2
-#' )
-#'
-#' my_fun <- list_to_function(funs)
-#' my_fun(1:5)
-list_to_function <- function(fun_list, simplify = TRUE) {
-
-    if (missing(fun_list))
-        stop("Missing fun_list")
-
-    function(x) {
-        sapply(fun_list, \(f) do.call(f, list(x)), simplify = simplify)
-    }
-}
-
 
 #' Keep even or odd indexes of a vector.
 #' @export
@@ -358,3 +330,5 @@ single_ind <- function(ind, arr, .dim = dim(arr)) {
         do.call(what = "[", args = append(list(ind_array), x))
     })
 }
+
+

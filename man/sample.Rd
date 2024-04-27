@@ -11,5 +11,5 @@ When x is a length 1 integer, it won't use sample.int. See
 the base definition of sample.
 }
 \seealso{
-\link{sample.int}
+[sample.int()]
 }
