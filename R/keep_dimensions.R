@@ -29,7 +29,9 @@ keep_dim <- function(x) {
 
 #' @export
 `[.keep_dim` <- function(x, ..., drop = FALSE) {
-    `[`(unclass(x), ..., drop = drop)
+    y <- `[`(unclass(x), ..., drop = drop)
+    class(y) <- c("keep_dim", class(y))
+    y
 }
 
 #' @rdname keep_dim
