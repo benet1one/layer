@@ -4,7 +4,6 @@
 #' @description
 #' By default, R will drop the dimensions of an array when a single row or 
 #' column is indexed. \code{x[i, j, ..., drop = TRUE]}.
-#' 
 #' Objects of class "keep_dim" will override this behaviour, so you don't have
 #' to add \code{drop = FALSE} at every command.
 #' 
@@ -35,7 +34,7 @@ keep_dim <- function(x) {
 }
 
 #' @rdname keep_dim
-#' @description remove "keep_dim" class from an object.
+#' @description Use \code{unkeep_dim} to remove "keep_dim" class from an object.
 #' @export
 unkeep_dim <- function(x) {
     class(x) <- setdiff(class(x), "keep_dim")

@@ -517,3 +517,41 @@ pyramid <- function(.data, values, by, level = fact[1L]) {
     .data
 }
 
+#' Round a vector such that their rounded sum stays intact.
+#' @description
+#' Useful for percentatges.
+#' 
+#' @param x Numeric Vector
+#' @param digits Number of decimal places. To mak
+#'
+#' @return Rounded vector with attributes:
+#' Threshold: indicating at which point numbers are rounded to their ceiling.
+#' Relative Threshold: the above in relation to the digits, to be compared with 0.5.
+#' Bias: mean difference between the result and the default rounding with the
+#' same digits.
+#' 
+#' @export
+#' @examples
+#' x <- rexp(20)
+#' x <- 100 * x / sum(x)
+#' x
+#' round_sum(x, 2)
+#' sum(round_sum(x, 2))
+round_sum <- function(x, digits = 0) {
+    target <- round(sum(x), digits = digits)
+    inc <- 10^-digits
+    floor_x <- (x %/% inc) * inc
+    differential <- (target - sum(floor_x)) / inc
+    decimal_part <- x - floor_x
+    nth <- -sort(-decimal_part, partial = differential)[differential]
+    to_ceil <- which(decimal_part >= nth)
+    
+    y <- floor_x
+    y[to_ceil] <- y[to_ceil] + inc
+    structure(y, threshold = decimal_part[differential], 
+              relative_threshold = decimal_part[differential] / inc,
+              bias = mean(y) - mean(round(x, digits = digits)))
+}
+
+
+

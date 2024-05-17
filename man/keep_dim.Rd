@@ -18,11 +18,10 @@ The same array, with class "keep_dim"
 \description{
 By default, R will drop the dimensions of an array when a single row or 
 column is indexed. \code{x[i, j, ..., drop = TRUE]}.
-
 Objects of class "keep_dim" will override this behaviour, so you don't have
 to add \code{drop = FALSE} at every command.
 
-remove "keep_dim" class from an object.
+Use \code{unkeep_dim} to remove "keep_dim" class from an object.
 }
 \examples{
 a <- matrix(1:16, nrow = 4)
