@@ -351,7 +351,7 @@ expand_grid <- function(..., KEEP.OUT.ATTRS = TRUE, stringsAsFactors = TRUE) {
 #' Convinient matrix definition.
 #' @description
 #' Supports ',,' for row breaks.
-#' @seealso [tibble::frame_matrix()]
+#' @seealso \link{tibble::frame_matrix}
 matrix_byrow <- function(..., .fill, .nrow, .ncol) {
 
     require(rlang)
@@ -454,7 +454,6 @@ calls_to_functions <- function(exprs, .args) {
     names(fun_list) <- names(exprs)
     fun_list
 }
-# calls_to_functions <- Vectorize(calls_to_functions, "exprs")
 
 
 #' Convert a list of functions to a single function.

@@ -5,7 +5,7 @@
 \title{Format a tempo object.
 with a flexible syntax.}
 \usage{
-\method{format}{tempo}(x, format = "\%H:\%M:\%S", digits = 3, ...)
+\method{format}{tempo}(x, format = "\%H:\%M:\%S", digits = 0L, ...)
 }
 \arguments{
 \item{x}{A tempo object.}

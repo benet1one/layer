@@ -28,7 +28,8 @@ keep_dim <- function(x) {
 
 #' @export
 `[.keep_dim` <- function(x, ..., drop = FALSE) {
-    y <- `[`(unclass(x), ..., drop = drop)
+    class(x) <- setdiff(class(x), "keep_dim")
+    y <- `[`(x, ..., drop = drop)
     class(y) <- c("keep_dim", class(y))
     y
 }

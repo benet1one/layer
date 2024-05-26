@@ -41,7 +41,8 @@ tempo <- list(
 #' @exportS3Method
 as.numeric.tempo <- function(x) unclass(x)
 #' @exportS3Method 
-print.tempo <- function(x) print(paste0(format.tempo(x), " "), quote = FALSE)
+print.tempo <- function(x) 
+    print(paste0(format.tempo(x, digits = 3L), " "), quote = FALSE)
 
 #' Format a tempo object.
 #' with a flexible syntax.
@@ -52,6 +53,7 @@ print.tempo <- function(x) print(paste0(format.tempo(x), " "), quote = FALSE)
 #' @param ... Ignored.
 #'
 #' @return A formatted character vector.
+#' @export format.tempo
 #' @exportS3Method
 #' 
 #' @details
@@ -71,7 +73,7 @@ print.tempo <- function(x) print(paste0(format.tempo(x), " "), quote = FALSE)
 #' format(my_tempo)
 #' format(my_tempo, "%H, %M, %S")
 #' format(my_tempo, "It's been %m minutes")
-format.tempo <- function(x, format = "%H:%M:%S", digits = 3, ...) {
+format.tempo <- function(x, format = "%H:%M:%S", digits = 0L, ...) {
 
     if (digits > 0) {
         dec <- (tempo$in_seconds(x) %% 1) %>%
