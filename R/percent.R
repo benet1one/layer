@@ -18,7 +18,7 @@ percent <- function(x) {
 
 #' @exportS3Method
 #' @export format.percent
-format.percent <- function(x, digits = 2L, spacing = 0L) {
+format.percent <- function(x, digits = 2L, spacing = 0L, ...) {
     y <- round(100*x, digits = digits) %>% 
         format.default(nsmall = digits) %>% 
         paste0("%", strrep(" ", spacing))
