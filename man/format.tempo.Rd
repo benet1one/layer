@@ -5,7 +5,7 @@
 \title{Format a tempo object.
 with a flexible syntax.}
 \usage{
-\method{format}{tempo}(x, format = "\%H:\%M:\%S", digits = 0L, ...)
+\method{format}{tempo}(x, format = "\%H:\%M:\%S", digits = 0L, trim_zero = FALSE, ...)
 }
 \arguments{
 \item{x}{A tempo object.}
@@ -13,6 +13,9 @@ with a flexible syntax.}
 \item{format}{Format to use. See \link{details}.}
 
 \item{digits}{Number of digits to add to \code{\%S}.}
+
+\item{trim_zero}{Whether to trim the first zero. Only works if it's the
+first character of the formatted string.}
 
 \item{...}{Ignored.}
 }

@@ -331,4 +331,9 @@ single_ind <- function(ind, arr, .dim = dim(arr)) {
     })
 }
 
-
+#' go_from_this To This
+#' @export
+format_title <- function(x, sep = "_") {
+    require(stringr)
+    str_replace_all(x, pattern = sep, replacement = " ") %>% str_to_title()
+}

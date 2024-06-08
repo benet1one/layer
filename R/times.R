@@ -50,6 +50,8 @@ print.tempo <- function(x)
 #' @param x A tempo object.
 #' @param format Format to use. See \link{details}.
 #' @param digits Number of digits to add to \code{\%S}.
+#' @param trim_zero Whether to trim the first zero. Only works if it's the
+#' first character of the formatted string.
 #' @param ... Ignored.
 #'
 #' @return A formatted character vector.
@@ -73,7 +75,8 @@ print.tempo <- function(x)
 #' format(my_tempo)
 #' format(my_tempo, "%H, %M, %S")
 #' format(my_tempo, "It's been %m minutes")
-format.tempo <- function(x, format = "%H:%M:%S", digits = 0L, ...) {
+format.tempo <- function(x, format = "%H:%M:%S", digits = 0L, 
+                         trim_zero = FALSE, ...) {
 
     if (digits > 0) {
         dec <- (tempo$in_seconds(x) %% 1) %>%
@@ -88,7 +91,7 @@ format.tempo <- function(x, format = "%H:%M:%S", digits = 0L, ...) {
     calculated <- numeric(6) %>% set_names(c("H", "M", "S", "h", "m", "s"))
     to_calculate <- match(unique(letters), names(calculated))
 
-    mapply(x, format, FUN = function(y, f) {
+    replaced <- mapply(x, format, FUN = function(y, f) {
 
         for (i in to_calculate) {
             calculated[i] <- tempo[[i]](y)
@@ -100,6 +103,10 @@ format.tempo <- function(x, format = "%H:%M:%S", digits = 0L, ...) {
         str_replace_vectorized(string = f, pattern = "%[HMShms]",
                                replacements = replacements)
     })
+    
+    if (trim_zero)
+        replaced <- stringr::str_remove(replaced, "^0")
+    replaced
 }
 
 
