@@ -1,7 +1,7 @@
 Package: layer
 Type: Package
 Title: Add a layer of utilities
-Version: 0.2.0
+Version: 0.2.1
 Author: Bernat Garcia
 Maintainer: Just a student and an R lover <benet1one@gmail.com>
 Description: These general purpose functions serve no great purpose. But they

@@ -337,3 +337,54 @@ format_title <- function(x, sep = "_") {
     require(stringr)
     str_replace_all(x, pattern = sep, replacement = " ") %>% str_to_title()
 }
+
+#' Cumulative Sums, Products, and Extremes for vectors with NA values.
+#' @rdname cumsum_na
+#' @description
+#' Makes it so NA values are neutral.
+#' 
+#' @param x Numeric vector.
+#' @param remove Whether to remove NA values altogether. 
+#' The resulting vector will be of lesser or equal length to x.
+#' @param replace Whether to replace original NA values in the original vector
+#' with NA in the resulting vector.
+#'
+#' @return Numeric vector.
+#' @export
+#'
+#' @examples
+#' x <- rpois(10, 5)
+#' x[c(4, 5, 8)] <- NA
+#' cumsum_na(x)
+#' cumprod_na(x)
+#' cummax_na(x)
+#' cummin_na(x)
+cumsum_na <- function(x, remove = FALSE, replace = TRUE) {
+    .cum_ops(x, fun = cumsum, neutral = 0, remove, replace)
+}
+#' @rdname cumsum_na
+#' @export
+cumprod_na <- function(x, remove = FALSE, replace = TRUE) {
+    .cum_ops(x, fun = cumprod, neutral = 1, remove, replace)
+}
+#' @rdname cumsum_na
+#' @export
+cummax_na <- function(x, remove = FALSE, replace = TRUE) {
+    .cum_ops(x, fun = cummax, neutral = -Inf, remove, replace)
+}
+#' @rdname cumsum_na
+#' @export
+cummin_na <- function(x, remove = FALSE, replace = TRUE) {
+    .cum_ops(x, fun = cummin, neutral = +Inf, remove, replace)
+}
+
+.cum_ops <- function(x, fun, neutral, remove, replace) {
+    nas <- is.na(x)
+    if (remove)
+        return(fun(x[!nas]))
+    x[nas] <- neutral
+    y <- fun(x)
+    if (replace)
+        is.na(y[nas]) <- TRUE
+    return(y)
+}

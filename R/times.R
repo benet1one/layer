@@ -109,4 +109,10 @@ format.tempo <- function(x, format = "%H:%M:%S", digits = 0L,
     replaced
 }
 
-
+#' @export
+Math.tempo <- function(x, ...) {
+    fun <- match.fun(.Generic)
+    x <- as.numeric(x)
+    x <- fun(x, ...)
+    Tempo(x)
+}
