@@ -2,7 +2,7 @@
 library(magrittr)
 
 #' Change a function's default parameters
-#'
+#' 
 #' @param fun A function,
 #' @param ... Named values, accepts injection.
 #' @param envir Where to start looking the old function with the
@@ -18,6 +18,9 @@ library(magrittr)
 #' use_names <- FALSE
 #' diag <- set_defaults(diag, nrow = 3, ncol = nrow / 2, names = !!use_names)
 #' old_diag <- reset_defaults(diag)
+#' 
+#' @import magrittr
+#' @import rlang
 set_defaults <- function(fun, ..., reassign = TRUE, envir = globalenv(),
                          warn = TRUE) {
 
@@ -351,7 +354,7 @@ expand_grid <- function(..., KEEP.OUT.ATTRS = TRUE, stringsAsFactors = TRUE) {
 #' Convinient matrix definition.
 #' @description
 #' Supports ',,' for row breaks.
-#' @seealso \link{tibble::frame_matrix}
+#' @seealso \link[tibble]{frame_matrix}
 matrix_byrow <- function(..., .fill, .nrow, .ncol) {
 
     require(rlang)
@@ -425,9 +428,7 @@ matrix_byrow <- function(..., .fill, .nrow, .ncol) {
 #'     \(x, y) sqrt(x) + y + z
 #' )
 function_list <- function(..., .args) {
-
     require(rlang)
-
     exprs <- enexprs(...)
     calls_to_functions(exprs, maybe_missing(.args))
 }
@@ -553,4 +554,102 @@ round_sum <- function(x, digits = 0) {
 }
 
 
-
+#' Generate the first combinations of n elements, taken m at a time
+#' @description
+#' Slight modification of \code{\link[utils]{combn}} to stop after
+#' a set number of combinations.
+#' 
+#' @param x vector source for combinations, or integer n for x <- seq_len(n).
+#' @param m number of elements to choose.
+#' @param first maximum number of combinations to return.
+#' @param warn logical, whether to warn if the actual number of combinations
+#' does not reach the maximum.
+#' @param FUN function to be applied to each combination. 
+#' @param simplify logical indicating if the result should be simplified 
+#' to an array.
+#' @param ... optionally, further arguments to \code{FUN}.
+#'
+#' @seealso [utils::combn()]
+#' @export
+#' @examples
+#' combn_first(10, 4, first = 5)
+combn_first <- function(x, m, first, warn = FALSE, 
+                        FUN = NULL, simplify = TRUE, ...) {
+    stopifnot(length(m) == 1L, is.numeric(m), is.numeric(first))
+    if (m < 0) 
+        stop("m < 0", domain = NA)
+    if (is.numeric(x) && length(x) == 1L && x > 0 && trunc(x) == 
+        x) 
+        x <- seq_len(x)
+    n <- length(x)
+    if (n < m) 
+        stop("n < m", domain = NA)
+    x0 <- x
+    if (simplify) {
+        if (is.factor(x)) 
+            x <- as.integer(x)
+    }
+    m <- as.integer(m)
+    e <- 0
+    h <- m
+    a <- seq_len(m)
+    nofun <- is.null(FUN)
+    if (!nofun && !is.function(FUN)) 
+        stop("'FUN' must be a function or NULL")
+    len.r <- length(r <- if (nofun) x[a] else FUN(x[a], ...))
+    count <- as.integer(round(choose(n, m)))
+    count <- min(count, first)
+    if (simplify) {
+        dim.use <- if (nofun) 
+            c(m, count)
+        else {
+            d <- dim(r)
+            if (length(d) > 1L) 
+                c(d, count)
+            else if (len.r != 1L) 
+                c(len.r, count)
+            else c(d, count)
+        }
+    }
+    if (simplify) 
+        out <- matrix(r, nrow = len.r, ncol = count)
+    else {
+        out <- vector("list", count)
+        out[[1L]] <- r
+    }
+    if (m > 0) {
+        i <- 2L
+        nmmp1 <- n - m + 1L
+        while (a[1L] != nmmp1 && i <= first) {
+            if (e < n - h) {
+                h <- 1L
+                e <- a[m]
+                j <- 1L
+            }
+            else {
+                e <- a[m - h]
+                h <- h + 1L
+                j <- 1L:h
+            }
+            a[m - h + j] <- e + j
+            r <- if (nofun) 
+                x[a]
+            else FUN(x[a], ...)
+            if (simplify) 
+                out[, i] <- r
+            else out[[i]] <- r
+            i <- i + 1L
+        }
+    }
+    if (simplify) {
+        if (is.factor(x0)) {
+            levels(out) <- levels(x0)
+            class(out) <- class(x0)
+        }
+        dim(out) <- dim.use
+    }
+    if (warn && count < first) {
+        warning("Number of combinations is lower than ", first)
+    }
+    out
+}
