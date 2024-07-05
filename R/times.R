@@ -1,5 +1,4 @@
 
-
 #' Create a tempo object.
 #' @description
 #' To be used with the tempo function family or be formatted using

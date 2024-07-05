@@ -21,6 +21,7 @@ library(magrittr)
 #' 
 #' @import magrittr
 #' @import rlang
+#' @importFrom rlang set_names
 set_defaults <- function(fun, ..., reassign = TRUE, envir = globalenv(),
                          warn = TRUE) {
 
@@ -312,43 +313,6 @@ rev_array <- function(x, margin = 1) {
     }
 
     x
-}
-
-#' Expand Grid with repeating support.
-#'
-#' @param ... Vectors or lists. Use "x \%^\% n" to have "n" columns for the vector "x"
-#'
-#' @seealso See \link{expand.grid}, the base version of the function, in which this
-#' one relies on.
-#'
-#' @examples expand_grid(1:3 %^% 2, letters[1:2])
-expand_grid <- function(..., KEEP.OUT.ATTRS = TRUE, stringsAsFactors = TRUE) {
-
-    pf <- parent.frame()
-    args <- as.list(substitute(...()))
-    new_args <- list()
-
-    `%^%` <- function(x, times) {
-        y <- substitute(x) %>% eval(envir = pf)
-        rep(list(y), times = times)
-    }
-
-    mapply(args, names(args), FUN = function(a, name) {
-        b <- eval(a)
-        if (!is.list(b))
-            b <- list(b)
-
-        names(b) <- if (length(b) == 1) {
-            name
-        } else {
-            paste0(name, "_", 1:length(b))
-        }
-        new_args <<- append(new_args, b)
-    })
-
-    expand.grid(new_args,
-                KEEP.OUT.ATTRS = KEEP.OUT.ATTRS,
-                stringsAsFactors = stringsAsFactors)
 }
 
 #' Convinient matrix definition.
@@ -653,3 +617,58 @@ combn_first <- function(x, m, first, warn = FALSE,
     }
     out
 }
+
+
+#' Split a for loop into expressions, with the looper variable replaced
+#' with each value.
+#' 
+#' @description
+#' Useful to split a single expression into multiple, without evaluating anything
+#' but the sequence.
+#' 
+#' @usage for_split(expr, recursive = TRUE, envir = parent.frame())
+#' for (variable in sequence) expression
+#' @param expr Call including all the for loop. 
+#' @param recursive Whether to split for loops inside for loops.
+#' @param envir Environment where to evaluate the sequence.
+#'
+#' @return A list of expressions. If the sequence is named, the result copies the names.
+#' If \code{recursive = TRUE}, it will be lists inside of lists. 
+#' @export
+#'
+#' @examples
+#' my_loop <- quote(
+#'     for(i in 1:3) for(j in 1:2)
+#'         a <- a + x[i, j]
+#' )
+#' fsplit <- for_split(my_loop)
+#' fsplit
+#' unlist(fsplit)
+for_split <- function(expr, recursive = TRUE, envir = parent.frame()) {
+    
+    if (format(expr[[1L]]) %in% c("(", "{"))
+        expr <- expr[[2L]]
+    
+    if (recursive && expr[[1L]] != quote(`for`)) 
+        return(expr)
+    
+    sequence <- expr[[3L]] |> eval(envir = envir)
+    interior <- expr[[4L]]
+    
+    looper_env <- list(NA)
+    names(looper_env) <- expr[[2L]] |> format()
+    result <- list()
+    
+    for (k in seq_along(sequence)) {
+        looper_env[[1L]] <- unname(sequence[k])
+        result[[k]] <- substituteDirect(interior, frame = looper_env)
+    }
+    
+    if (recursive)
+        result <- lapply(result, for_split, recursive = TRUE, envir = envir)
+    
+    names(result) <- names(sequence)
+    structure(result, variable = names(looper_env), sequence = sequence)
+}
+
+
