@@ -39,7 +39,8 @@ formals(cat0)$sep <- ""
 
 #' Concatenate and print, supports line breaks from double comma ',,'
 #' @export
-#' @examples catln("The answer to all is", 42,, "And 2 + 3 = ", 5)
+#' @examples catln(1, ". This is the first line, and",, 
+#' 2, ". this is the second line.")
 catln <- function(..., sep = "") {
     dots <- as.list(substitute(...()))
     dots[sapply(dots, identical, substitute())] <- "\n"

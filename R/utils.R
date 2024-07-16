@@ -1,6 +1,4 @@
 
-library(magrittr)
-
 #' Change a function's default parameters
 #' 
 #' @param fun A function,
@@ -19,9 +17,8 @@ library(magrittr)
 #' diag <- set_defaults(diag, nrow = 3, ncol = nrow / 2, names = !!use_names)
 #' old_diag <- reset_defaults(diag)
 #' 
-#' @import magrittr
 #' @import rlang
-#' @importFrom rlang set_names
+#' @rawNamespace import(magrittr, except = set_names) 
 set_defaults <- function(fun, ..., reassign = TRUE, envir = globalenv(),
                          warn = TRUE) {
 
