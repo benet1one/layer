@@ -10,8 +10,20 @@ collapse <- function(string, sep = "") {
     !is.element(e1, set)
 }
 
+#' Return the first element unless it's null, in which case returns the second.
+#' @examples
+#' x <- runif(5)
+#' y <- names(x) %or% seq_along(x)
+#' print(y)
+#' names(x) <- letters[1:5]
+#' y <- names(x) %or% seq_along(x)
+#' print(y)
+#' @export
+`%or%` <- function(e1, e2) {
+    if (!is.null(e1)) e1  else e2
+}
+
 #' Check if an argument is missing, NULL, or of length 0.
-#'
 #' @param x Usually a function argument, can also be any object.
 #' @export
 len0 <- function(x) {

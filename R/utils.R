@@ -514,6 +514,18 @@ round_sum <- function(x, digits = 0) {
               bias = mean(y) - mean(round(x, digits = digits)))
 }
 
+#' Distribute an Amount of something Between something.
+#' @param amount Numeric, target sum of the values.
+#' @param between Integer, number of values.
+#' @param dist Optionally, an initial distribution for how the values are distributed.
+#' @param digits Digits of the values.
+#' @return Numeric vector of length \code{between}, 
+#' the values of which add up to \code{amount}.
+#' @export
+distribute <- function(amount, between, dist = runif(between), digits = 0) {
+    values <- dist * amount / sum(dist)
+    round_sum(values, digits)
+}
 
 #' Generate the first combinations of n elements, taken m at a time
 #' @description
@@ -536,11 +548,10 @@ round_sum <- function(x, digits = 0) {
 #' combn_first(10, 4, first = 5)
 combn_first <- function(x, m, first, warn = FALSE, 
                         FUN = NULL, simplify = TRUE, ...) {
-    stopifnot(length(m) == 1L, is.numeric(m), is.numeric(first))
+    stopifnot(length(m) == 1L, is.numeric(m), length(first) == 1L, is.numeric(first))
     if (m < 0) 
         stop("m < 0", domain = NA)
-    if (is.numeric(x) && length(x) == 1L && x > 0 && trunc(x) == 
-        x) 
+    if (is.numeric(x) && length(x) == 1L && x > 0 && trunc(x) == x) 
         x <- seq_len(x)
     n <- length(x)
     if (n < m) 
@@ -615,6 +626,39 @@ combn_first <- function(x, m, first, warn = FALSE,
     out
 }
 
+combn_random <- function(x, m, amount, warn = FALSE, simplify = TRUE, ...) {
+    stopifnot(is_integerish(m, n = 1L), is_integerish(amount, n = 1L))
+    if (m < 0) 
+        stop("m < 0", domain = NA)
+    if (is_integerish(x, n = 1L)) 
+        x <- seq_len(x)
+    n <- length(x)
+    if (n < m) 
+        stop("n < m", domain = NA)
+    
+    
+}
+
+combn_recurse <- function(x, m) {
+    
+    n <- length(x)
+    if (n == 1L || m == 1L) return(t(x))
+    
+    mat <- matrix(nrow = m, ncol = choose(n, m))
+    k <- 1L
+    j <- 1L
+    
+    while (j <= ncol(mat)) {
+        recurse <- combn_recurse(x[-(1:k)], m-1L)
+        l <- j + ncol(recurse) - 1L
+        mat[1, j:l] <- x[k]
+        mat[2:nrow(mat), j:l] <- recurse
+        j <- l + 1L
+        k <- k + 1L
+    }
+    
+    return(mat)
+}
 
 #' Split a for loop into expressions, with the looper variable replaced
 #' with each value.
