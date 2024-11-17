@@ -121,7 +121,7 @@ change_variable <- function(f, variables) {
         stop("'variables' must be a character vector.")
     for (v in variables)
         if (!is.element(v, formalArgs(f)))
-            stop("Variable ", v, " not an argument in function.")
+            stop("Variable '", v, "' not an argument in function.")
     
     parameters <- formals(f)[names(formals(f)) %!in% variables]
     
@@ -189,11 +189,13 @@ for_split <- function(expr, recursive = TRUE, envir = parent.frame()) {
 
 #' Analytical Derivative of a Function
 #'
-#' @param f Function to derivate.
+#' @param f Function to derivate. Supports Lambda notation.
 #' @param arg String, variable to derivate by.
 #'
-#' @return A new function.
+#' @return A new function, which takes the same arguments as f
+#' and returns a single numeric value.
 #' @export 
+#' @seealso [gradient()]
 derivate <- function(f, arg = formalArgs(f)[1L]) {
     
     f <- rlang::as_function(f)
@@ -201,11 +203,58 @@ derivate <- function(f, arg = formalArgs(f)[1L]) {
     if (!is_string(arg))
         stop("'arg' must be a string containing the variable to derivate by.")
     if (!is.element(arg, formalArgs(f)))
-        stop("'arg' is not an argument in 'f'")
+        warning("arg ", arg, " is not an argument in 'f'")
     
     rlang::new_function(
         args = formals(f),
         body = body(f) |> inside() |> D(arg)
+    )
+}
+
+#' Analytical Gradient of a function.
+#' 
+#' @param f Function to derivate.
+#' @param args Character vector, which variables to derivate by.
+#' 
+#' @return A new function which takes the same arguments as f
+#' and returns a named numeric vector.
+#' @export
+#' @seealso [derivate()]
+gradient <- function(f, args = formalArgs(f)) {
+    if (!is_character(args))
+        stop("'args' must be a character vector containing the variables to derivate by.")
+    for (arg in args)
+        if (!is.element(arg, formalArgs(f)))
+            warning("arg ", arg, " is not an argument in 'f'")
+    
+    bdy <- inside(body(f))
+    grad <- purrr::map(args, ~ D(bdy, .x)) |> set_names(args)
+    rlang::new_function(
+        args = formals(f),
+        body = expr({
+            c(!!!grad)
+        })
+    )
+}
+
+#' THIS IS VERY SLOW AND NEEDS TO BE MADE TWICE AS FAST!!!
+hessian <- function(f, args = formalArgs(f)) {
+    if (!is_character(args))
+        stop("'args' must be a character vector containing the variables to derivate by.")
+    for (arg in args)
+        if (!is.element(arg, formalArgs(f)))
+            warning("arg ", arg, " is not an argument in 'f'")
+    
+    bdy <- inside(body(f))
+    grid <- expand.grid(row = args, col = args, stringsAsFactors = FALSE)
+    dvec <- purrr::map2(grid$row, grid$col, ~ bdy |> D(.x) |> D(.y))
+    
+    new_function(
+        args = formals(f),
+        body = expr({
+            flat_hessian <- c(!!!dvec)
+            matrix(flat_hessian, nrow = length(args), dimnames = list(args, args))
+        })
     )
 }
 
@@ -221,9 +270,10 @@ derivate_num <- function(f, arg = formalArgs(f)[1L], ...) {
     f <- rlang::as_function(f)
     
     if (is_lambda(f)) 
-        return(function(.x) {
-            pracma::fderiv(f, .x, ...)
-        })
+        return(new_function(
+            args = alist(.x=),
+            body = expr({pracma::fderiv(f, .x, ...)})
+        ))
     
     f2 <- change_variable(f, arg)
     
@@ -233,6 +283,30 @@ derivate_num <- function(f, arg = formalArgs(f)[1L], ...) {
             pracma::fderiv(f2, !!parse_expr(arg), ...)
         })
     )
+}
+
+#' Invert a function
+#'
+#' @param f Function to invert.
+#' @param interval Length 2 vector containing the lower and upper bound of the result.
+#' @param no_root Value to return when there is no root.
+#' @param arg Argument of f to invert by.
+#'
+#' @return Inverse function: inv(y, ...) = {x : f(x, ...) = y}
+#' @export
+invert <- function(f, interval, no_root = NaN, arg = formalArgs(f)[1L]) {
+    stopifnot(is.numeric(interval), 
+              length(interval) == 2L,
+              interval[1] < interval[2])
+    
+    f <- change_variable(f, arg)
+    
+    inv <- function(y, ...) {
+        if ((f(interval[1]) - y) * (f(interval[2]) - y) > 0)
+            return(no_root)
+        uniroot(\(x) f(x, ...) - y, interval) $ root
+    }
+    Vectorize(inv, "y")
 }
 
 

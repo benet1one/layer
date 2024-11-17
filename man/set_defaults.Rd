@@ -36,5 +36,4 @@ defaults. You can save them before overwriting by using \link{formals}
 use_names <- FALSE
 diag <- set_defaults(diag, nrow = 3, ncol = nrow / 2, names = !!use_names)
 old_diag <- reset_defaults(diag)
-
 }

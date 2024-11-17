@@ -7,13 +7,17 @@
 derivate(f, arg = formalArgs(f)[1L])
 }
 \arguments{
-\item{f}{Function to derivate.}
+\item{f}{Function to derivate. Supports Lambda notation.}
 
-\item{arg}{Variable to derivate by.}
+\item{arg}{String, variable to derivate by.}
 }
 \value{
-A new function.
+A new function, which takes the same arguments as f
+and returns a single numeric value.
 }
 \description{
 Analytical Derivative of a Function
+}
+\seealso{
+[gradient()]
 }

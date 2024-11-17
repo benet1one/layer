@@ -3,7 +3,7 @@
 \name{minimize}
 \alias{minimize}
 \alias{maximize}
-\title{Optimize a function}
+\title{Optimize a multi-variate function.}
 \usage{
 minimize(f, init, ...)
 
@@ -20,5 +20,5 @@ maximize(f, init, ...)
 List with the \code{solution} and \code{objective_value}.
 }
 \description{
-Optimize a function
+Optimize a multi-variate function.
 }
