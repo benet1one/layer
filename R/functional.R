@@ -309,7 +309,29 @@ invert <- function(f, interval, no_root = NaN, arg = formalArgs(f)[1L]) {
     Vectorize(inv, "y")
 }
 
-
+#' Find the value of a variable such that an equality is true
+#'
+#' @param variable Variable to find the value of.
+#' @param equality Equality expression.
+#' @param interval Interval where the value can be.
+#' 
+#' @returns The value of the variable if it's in the interval, an error otherwise.
+#' @examples
+#' x_hat <- x |> such_that(exp(x) == 5*x^2, interval = c(1, 10))
+such_that <- function(variable, equality, interval) {
+    variable <- enexpr(variable)
+    equality <- inside(enexpr(equality))
+    
+    if (equality[[1L]] != quote(`==`))
+        stop("Expression must be an equality.")
+    
+    arg <- list(substitute())
+    names(arg) <- format(variable)
+    lhs <- new_function(arg, body = equality[[2L]])
+    rhs <- new_function(arg, body = equality[[3L]])
+    
+    uniroot(\(x) lhs(x) - rhs(x), interval) $ root
+}
 
 .optim <- function(f, init, maximize, ...) {
     f2 <- rlang::as_function(f)
