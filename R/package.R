@@ -1,7 +1,6 @@
 
 #' @import rlang
-#' @import purrr
-#' @import pracma
+#' @import stringr
 #' @rawNamespace import(magrittr, except = set_names)
 
 hello_layer <- function() {

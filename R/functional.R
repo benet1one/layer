@@ -266,14 +266,15 @@ hessian <- function(f, args = formalArgs(f)) {
 #' @export
 derivate_num <- function(f, arg = formalArgs(f)[1L], ...) {
     
-    require(pracma)
+    rlang::check_installed("pracma")
     f <- rlang::as_function(f)
     
-    if (is_lambda(f)) 
+    if (is_lambda(f)) {
         return(new_function(
             args = alist(.x=),
             body = expr({pracma::fderiv(f, .x, ...)})
         ))
+    }
     
     f2 <- change_variable(f, arg)
     
@@ -315,6 +316,7 @@ invert <- function(f, interval, no_root = NaN, arg = formalArgs(f)[1L]) {
 #' @param equality Equality expression.
 #' @param interval Interval where the value can be.
 #' 
+#' @export
 #' @returns The value of the variable if it's in the interval, an error otherwise.
 #' @examples
 #' x_hat <- x |> such_that(exp(x) == 5*x^2, interval = c(1, 10))

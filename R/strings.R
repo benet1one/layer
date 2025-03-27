@@ -42,7 +42,6 @@ str_split_keep <- function(string, pattern, where = "left") {
 #' @export
 str_split_index <- function(string, index, where = "left") {
     
-    require(stringr)
     switch(where,
            "left"   = NULL,
            "right"  = index %<>% add(-1L),
