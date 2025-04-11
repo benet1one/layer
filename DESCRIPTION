@@ -15,5 +15,5 @@ Imports:
     rlang,
     stringr
 Suggests: 
-    pracma,
+    numDeriv,
     purrr

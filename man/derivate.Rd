@@ -2,21 +2,28 @@
 % Please edit documentation in R/functional.R
 \name{derivate}
 \alias{derivate}
-\title{Analytical Derivative of a Function}
+\alias{derivate_num}
+\title{Analytical and Numerical Derivative of a Function}
 \usage{
 derivate(f, arg = formalArgs(f)[1L])
+
+derivate_num(f)
 }
 \arguments{
-\item{f}{Function to derivate. Supports Lambda notation.}
+\item{f}{Function to derivate. For \code{derivate()}, the variable
+must be a scalar. For \code{derivate_num()}, the variable can either be
+a scalar or a vector.}
 
-\item{arg}{String, variable to derivate by.}
+\item{arg}{String, variable to derivate by. For derivating multiple function arguments,
+see [gradient()].}
 }
 \value{
-A new function, which takes the same arguments as f
-and returns a single numeric value.
+A new function which takes the same arguments as \code{f}
+and returns a scalar for \code{derivate()}, and a scalar or vector
+for \code{derivate_num()}.
 }
 \description{
-Analytical Derivative of a Function
+Analytical and Numerical Derivative of a Function
 }
 \seealso{
 [gradient()]

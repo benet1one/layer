@@ -187,19 +187,22 @@ for_split <- function(expr, recursive = TRUE, envir = parent.frame()) {
 
 # Math -------------------------
 
-#' Analytical Derivative of a Function
+#' Analytical and Numerical Derivative of a Function
 #'
-#' @param f Function to derivate. Supports Lambda notation.
-#' @param arg String, variable to derivate by.
+#' @rdname derivate
+#' @param f Function to derivate. For \code{derivate()}, the variable
+#' must be a scalar. For \code{derivate_num()}, the variable can either be
+#' a scalar or a vector. 
+#' @param arg String, variable to derivate by. For derivating multiple function arguments,
+#' see [gradient()].
 #'
-#' @return A new function, which takes the same arguments as f
-#' and returns a single numeric value.
+#' @return A new function which takes the same arguments as \code{f}
+#' and returns a scalar for \code{derivate()}, and a scalar or vector
+#' for \code{derivate_num()}.
 #' @export 
 #' @seealso [gradient()]
 derivate <- function(f, arg = formalArgs(f)[1L]) {
     
-    f <- rlang::as_function(f)
-
     if (!is_string(arg))
         stop("'arg' must be a string containing the variable to derivate by.")
     if (!is.element(arg, formalArgs(f)))
@@ -211,28 +214,79 @@ derivate <- function(f, arg = formalArgs(f)[1L]) {
     )
 }
 
-#' Analytical Gradient of a function.
+#' @rdname derivate
+#' @export
+derivate_num <- function(f) {
+    
+    rlang::check_installed("numDeriv")
+    f <- rlang::as_function(f)
+    
+    if (rlang::is_lambda(f)) {
+        return(new_function(
+            args = alist(.x=),
+            body = expr({
+                numDeriv::grad(f, .x)
+            })
+        ))
+    }
+    
+    first_arg <- formalArgs(f)[1L]
+    other_args <- formalArgs(f)[-1L]
+    dots_args <- parse_exprs(other_args) |> set_names(other_args)
+    
+    new_function(
+        args = formals(f),
+        body = expr({
+            numDeriv::grad(f, !!parse_expr(first_arg), !!!dots_args)
+        })
+    )
+}
+
+#' Analytical and Numeric Gradient of a function.
 #' 
-#' @param f Function to derivate.
-#' @param args Character vector, which variables to derivate by.
+#' @rdname gradient
+#' @param f Function to derivate. Each argument must take a scalar. If you wish to
+#' get the gradient of a function that takes a vector, use [derivate_num()].
 #' 
-#' @return A new function which takes the same arguments as f
+#' @return A new function which takes the same arguments as \code{f}
 #' and returns a named numeric vector.
 #' @export
 #' @seealso [derivate()]
-gradient <- function(f, args = formalArgs(f)) {
-    if (!is_character(args))
-        stop("'args' must be a character vector containing the variables to derivate by.")
-    for (arg in args)
-        if (!is.element(arg, formalArgs(f)))
-            warning("arg ", arg, " is not an argument in 'f'")
+gradient <- function(f) {
     
+    args <- formalArgs(f)
     bdy <- inside(body(f))
     grad <- purrr::map(args, ~ D(bdy, .x)) |> set_names(args)
     rlang::new_function(
         args = formals(f),
         body = expr({
             c(!!!grad)
+        })
+    )
+}
+
+#' @rdname gradient
+#' @export
+gradient_num <- function(f) {
+    
+    rlang::check_installed("numDeriv")
+    args <- formalArgs(f)
+    
+    substitution_list <- purrr::map(args, \(a) rlang::expr(.args[!!a])) |>
+        rlang::set_names(args)
+    
+    conversion <- rlang::parse_exprs(args) |> 
+        rlang::set_names(args)
+    
+    f2 <- rlang::new_function(
+        args = alist(.args=),
+        body = substituteDirect(body(f), substitution_list)
+    )
+    
+    rlang::new_function(
+        args = formals(f),
+        body = rlang::expr({
+            numDeriv::grad(f2, c(!!!conversion)) |> rlang::set_names(args)
         })
     )
 }
@@ -258,34 +312,6 @@ hessian <- function(f, args = formalArgs(f)) {
     )
 }
 
-#' Numeric Derivative of a Function
-#' @param f Function to derivate.
-#' @param arg String, variable to derivate by.
-#' 
-#' @return A new function.
-#' @export
-derivate_num <- function(f, arg = formalArgs(f)[1L], ...) {
-    
-    rlang::check_installed("pracma")
-    f <- rlang::as_function(f)
-    
-    if (is_lambda(f)) {
-        return(new_function(
-            args = alist(.x=),
-            body = expr({pracma::fderiv(f, .x, ...)})
-        ))
-    }
-    
-    f2 <- change_variable(f, arg)
-    
-    new_function(
-        args = list(substitute()) |> set_names(arg),
-        body = expr({
-            pracma::fderiv(f2, !!parse_expr(arg), ...)
-        })
-    )
-}
-
 #' Invert a function
 #'
 #' @param f Function to invert.
@@ -302,7 +328,7 @@ invert <- function(f, interval, no_root = NaN, arg = formalArgs(f)[1L]) {
     
     f <- change_variable(f, arg)
     
-    inv <- function(y, ...) {
+    inv <- \(y, ...) {
         if ((f(interval[1]) - y) * (f(interval[2]) - y) > 0)
             return(no_root)
         uniroot(\(x) f(x, ...) - y, interval) $ root

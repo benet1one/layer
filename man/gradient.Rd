@@ -2,21 +2,23 @@
 % Please edit documentation in R/functional.R
 \name{gradient}
 \alias{gradient}
-\title{Analytical Gradient of a function.}
+\alias{gradient_num}
+\title{Analytical and Numeric Gradient of a function.}
 \usage{
-gradient(f, args = formalArgs(f))
+gradient(f)
+
+gradient_num(f)
 }
 \arguments{
-\item{f}{Function to derivate.}
-
-\item{args}{Character vector, which variables to derivate by.}
+\item{f}{Function to derivate. Each argument must take a scalar. If you wish to
+get the gradient of a function that takes a vector, use [derivate_num()].}
 }
 \value{
-A new function which takes the same arguments as f
+A new function which takes the same arguments as \code{f}
 and returns a named numeric vector.
 }
 \description{
-Analytical Gradient of a function.
+Analytical and Numeric Gradient of a function.
 }
 \seealso{
 [derivate()]
