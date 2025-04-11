@@ -10,5 +10,5 @@ matrix_byrow(..., .fill, .nrow, .ncol)
 Supports ',,' for row breaks.
 }
 \seealso{
-\link[tibble]{frame_matrix}
+[tibble::frame_matrix()]
 }

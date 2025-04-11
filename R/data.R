@@ -61,7 +61,7 @@ rev_array <- function(x, margin = 1) {
 #' Convinient matrix definition.
 #' @description
 #' Supports ',,' for row breaks.
-#' @seealso \link[tibble]{frame_matrix}
+#' @seealso [tibble::frame_matrix()]
 matrix_byrow <- function(..., .fill, .nrow, .ncol) {
     
     require(rlang)
