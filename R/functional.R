@@ -184,6 +184,90 @@ for_split <- function(expr, recursive = TRUE, envir = parent.frame()) {
     structure(result, variable = names(looper_env), sequence = sequence)
 }
 
+# Mapper ------------------------------
+
+#' Catch attempt to use through outside of traverse or nested inside another through.
+#' @param x Whatever
+#' @returns An error.
+#' @export
+through <- function(x) {
+    stop("'through' can only be used inside 'traverse' and cannot be nested inside another 'through'")
+}
+
+.traverse_replace <- function(expr, variable) {
+    if (rlang::is_syntactic_literal(expr) || rlang::is_symbol(expr)) {
+        return(list(expr = expr, change = FALSE, value = NULL))
+    }
+    
+    if (expr[[1L]] == rlang::expr(through)) {
+        value <- expr[[2L]]
+        expr <- rlang::parse_expr(variable)
+        return(list(expr = expr, change = TRUE, value = value))
+    }
+    
+    for (k in 2:length(expr)) {
+        rec <- Recall(expr[[k]], variable)
+        expr[[k]] <- rec$expr
+        
+        if (rec$change)
+            return(list(expr = expr, change = TRUE, value = rec$value))
+    }
+    
+    return(list(expr = expr, change = FALSE, value = FALSE))
+}
+
+#' Traverse through one or more vector or lists in parallel.
+#' 
+#' @description
+#' Super cool alternative to [base::mapply()].
+#' Use \code{through(vector)} to tell the apply the expression to each of the values of \code{vector}.
+#' You can use multiple \code{through()} statements to traverse the multiple vectors in parallel.
+#' It is NOT possible to nest a \code{through()} statement inside another, and will return an error.
+#' 
+#' @param expr Expression to evaluate.
+#' 
+#' @returns A list.
+#' @export
+#'
+#' @examples
+#' x <- list(1:3, 4:5, 6:9)
+#' y <- c(1, 2, 4)
+#' traverse( through(x) + through(y) )
+#' traverse( letters[through(x)] )
+#' traverse( rep(through(letters), times = through(1:26)) )
+traverse <- function(expr) {
+    expr <- rlang::enexpr(expr)
+    variables <- character()
+    values <- list()
+    
+    for (k in 1:100) {
+        variables[k] <- paste0(".x", k)
+        replaced <- .traverse_replace(expr, variables[k])
+        expr <- replaced$expr
+        
+        if (!replaced$change)
+            break
+        
+        values[[k]] <- replaced$value
+    }
+    
+    if (k == 1L)
+        return(list(eval(expr, parent.frame())))
+    
+    variables <- variables[-k]
+    names(values) <- variables
+    args <- alist(.x=) |> 
+        rep_len(length(variables)) |> 
+        rlang::set_names(variables)
+    
+    fn <- rlang::new_function(
+        args = args,
+        body = expr
+    )
+    
+    call <- rlang::expr(mapply(!!!values, !!fn, SIMPLIFY = FALSE, USE.NAMES = FALSE))
+    eval(call, envir = parent.frame())
+}
 
 # Math -------------------------
 
