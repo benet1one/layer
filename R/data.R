@@ -131,3 +131,29 @@ pyramid <- function(.data, values, by, level = fact[1L]) {
     
     .data
 }
+
+
+#' Stack multiple vectors of different length.
+#'
+#' @param ... \code{name1 = vector1, name2 = vector2, ...} \cr
+#' The names are sent to the column \code{.names_to}
+#' as a factor, and the vectors are stacked on the columns \code{.values_to}.
+#' @param .names_to Name of the factor column.
+#' @param .values_to Name of the value column.
+#'
+#' @returns A tibble where the name column is a factor and the value column are the stacked vectors.
+#' @export
+#'
+#' @examples
+#' stack_vectors(a = runif(6), b = rpois(4, 2))
+#' stack_vectors(a = runif(6), b = rpois(4, 2),
+#'     .names_to = "category",
+#'     .values_to = "number")
+stack_vectors <- function(..., .names_to = "name", .values_to = "value") {
+    vecs <- rlang::dots_list(..., .named = TRUE, .ignore_empty = "all")
+    out <- tibble::tibble(
+        name = rep(names(vecs), lengths(vecs)) |> factor(),
+        value = unlist(vecs)
+    )
+    rlang::set_names(out, c(.names_to, .values_to))
+}

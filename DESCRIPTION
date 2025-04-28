@@ -13,7 +13,8 @@ RoxygenNote: 7.3.2
 Imports: 
     magrittr,
     rlang,
-    stringr
+    stringr,
+    tibble
 Suggests: 
     numDeriv,
     purrr
