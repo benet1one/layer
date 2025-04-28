@@ -22,6 +22,7 @@ It is NOT possible to nest a \code{through()} statement inside another, and will
 x <- list(1:3, 4:5, 6:9)
 y <- c(1, 2, 4)
 traverse( through(x) + through(y) )
+traverse( sum(through(x), through(y)) )
 traverse( letters[through(x)] )
 traverse( rep(through(letters), times = through(1:26)) )
 }
