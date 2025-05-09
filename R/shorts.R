@@ -401,3 +401,11 @@ cummin_na <- function(x, remove = FALSE, replace = TRUE) {
         is.na(y[nas]) <- TRUE
     return(y)
 }
+
+
+#' Get the levels of a factor as a factor.
+#'
+#' @export
+levels_f <- function(x) {
+    factor(levels(x), levels = levels(x))
+}
