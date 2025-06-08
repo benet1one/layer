@@ -446,25 +446,23 @@ such_that <- function(variable, equality, interval) {
     uniroot(\(x) lhs(x) - rhs(x), interval) $ root
 }
 
-.optim <- function(f, init, maximize, ...) {
-    f2 <- rlang::as_function(f)
-    formals(f2) <- exprs(
-        .x = , 
-        .  = .x, 
-        .y = stop(".y not supported in optimisation, use a length 2 vector.")
-    )
-    
-    f3 <- if (maximize) {
-         \(x) { -f2(x) }
-    } else {
-        f2
+.optim <- function(f, init, lower, upper, maximize = FALSE, ...) {
+    f <- rlang::as_function(f)
+    if (rlang::is_lambda(f)) {
+        formals(f) <- alist(
+            ... = , . = ..1, .x = ..1, .y = stop(".y not supported. Use a vector.")
+        )
     }
     
-    sol <- optim(fn = f3, par = init, ...)
-    list(
-        solution = sol$par,
-        objective_value = if (maximize) -sol$value  else sol$value
-    )
+    if (is.null(init)) {
+        sol <- optimize(f, interval = c(lower, upper), maximum = maximize, ...)
+        list(solution = sol[[1L]], objective_value = sol$objective)
+        
+    } else {
+        control <- list(fnscale = if (maximize) -1 else +1)
+        sol <- optim(fn = f, par = init, control = control, ...)
+        list(solution = sol$par, objective_value = sol$value)
+    }
 }
 
 #' Optimize a multi-variate function.
@@ -472,17 +470,21 @@ such_that <- function(variable, equality, interval) {
 #' @export
 #' @param f Function to optimise.
 #' @param init Initial values for the variable.
-#' @param ... Arguments passed on to  \link[stats]{optim}.
+#' @param ... Arguments passed on to [stats::optimize()] for univariate optimization 
+#' or [stats::optim()] for multivariate optimization.
 #' 
 #' @return List with the \code{solution} and \code{objective_value}.
-minimize <- function(f, init, ...) {
-    .optim(f, init, maximize = FALSE, ...)
+#' @examples
+#' minimize(~ (.x - 3)^2,  lower = -5, upper = +5)
+#' minimize(~ (.["a"] + 5)^2 + (.["b"] - 1)^2,  init = c(a=0, b=0))
+minimize <- function(f, init = NULL, lower, upper, ...) {
+    .optim(f, init, lower, upper, maximize = FALSE, ...)
 }
 
 #' @rdname layer_optim
 #' @export
-maximize <- function(f, init, ...) {
-    .optim(f, init, maximize = TRUE, ...)
+maximize <- function(f, init = NULL, lower, upper, ...) {
+    .optim(f, init, lower, upper, maximize = TRUE, ...)
 }
 
 
