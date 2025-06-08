@@ -236,6 +236,11 @@ through <- function(x) {
 #' traverse( sum(through(x), through(y)) )
 #' traverse( letters[through(x)] )
 #' traverse( rep(through(letters), times = through(1:26)) )
+#' 
+#' a <- rnorm(15)
+#' b <- a + rnorm(15)
+#' cor_methods <- c("pearson", "spearman", "kendall")
+#' traverse( cor(a, b, method = through(cor_methods)) )
 traverse <- function(expr) {
     expr <- rlang::enexpr(expr)
     variables <- character()
