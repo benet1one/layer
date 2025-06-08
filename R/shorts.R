@@ -222,7 +222,7 @@ within_list <- function(expr) {
 #' When x is a length 1 integer, it won't use sample.int. See
 #' the base definition of sample.
 #' @export
-#' @seealso [sample.int()]
+#' @seealso [base::sample()]
 sample <- function (x, size, replace = FALSE, prob = NULL) {
     if (missing(size))
         size <- length(x)
@@ -408,4 +408,43 @@ cummin_na <- function(x, remove = FALSE, replace = TRUE) {
 #' @export
 levels_f <- function(x) {
     factor(levels(x), levels = levels(x))
+}
+
+#' Number of unique values.
+#' 
+#' If `include_na = FALSE`, always gives the same result as 
+#' `length(unique(x))`, but much faster. 
+#'
+#' @param x Array or factor.
+#' @param include_na Logical, whether to count missing values as a different unique value.
+#' By default it is `TRUE` so that it gives the same result as `length(unique(x))`.
+#' If `FALSE`, it is equivalent to `length(unique(x[!is.na(x)])` but much faster.
+#'
+#' @returns Integer indicating the number of unique values.
+#' @export
+#'
+#' @examples
+#' x <- rpois(100, 3.5)
+#' length_unique(x)
+#' # length(unique(x))
+#' 
+#' x[1:3] <- NA
+#' length_unique(x)
+#' # length(unique(x))
+#' length_unique(x, include_na = FALSE)
+#' # length(unique(x[!is.na(x)])
+length_unique <- function(x, include_na = TRUE) {
+    if (is.factor(x)) {
+        if (include_na) {
+            length(levels(x)) + anyNA(x)
+        } else {
+            length(levels(x))
+        }
+    } else {
+        if (include_na) {
+            length(x) - sum(duplicated(x))
+        } else {
+            length(x) - sum(duplicated(x)) - anyNA(x)
+        }
+    }
 }
