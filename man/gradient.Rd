@@ -11,7 +11,7 @@ gradient_num(f)
 }
 \arguments{
 \item{f}{Function to derivate. Each argument must take a scalar. If you wish to
-get the gradient of a function that takes a vector, use [derivate_num()].}
+get the gradient of a function that takes a vector, use \code{\link[=derivate_num]{derivate_num()}}.}
 }
 \value{
 A new function which takes the same arguments as \code{f}
@@ -21,5 +21,5 @@ and returns a named numeric vector.
 Analytical and Numeric Gradient of a function.
 }
 \seealso{
-[derivate()]
+\code{\link[=derivate]{derivate()}}
 }

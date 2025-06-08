@@ -15,7 +15,7 @@ must be a scalar. For \code{derivate_num()}, the variable can either be
 a scalar or a vector.}
 
 \item{arg}{String, variable to derivate by. For derivating multiple function arguments,
-see [gradient()].}
+see \code{\link[=gradient]{gradient()}}.}
 }
 \value{
 A new function which takes the same arguments as \code{f}
@@ -26,5 +26,5 @@ for \code{derivate_num()}.
 Analytical and Numerical Derivative of a Function
 }
 \seealso{
-[gradient()]
+\code{\link[=gradient]{gradient()}}
 }

@@ -13,7 +13,7 @@ traverse(expr)
 A list.
 }
 \description{
-Super cool alternative to [base::mapply()].
+Super cool alternative to \code{\link[base:mapply]{base::mapply()}}.
 Use \code{through(vector)} to tell the apply the expression to each of the values of \code{vector}.
 You can use multiple \code{through()} statements to traverse the multiple vectors in parallel.
 It is NOT possible to nest a \code{through()} statement inside another, and will return an error.
@@ -25,4 +25,9 @@ traverse( through(x) + through(y) )
 traverse( sum(through(x), through(y)) )
 traverse( letters[through(x)] )
 traverse( rep(through(letters), times = through(1:26)) )
+
+a <- rnorm(15)
+b <- a + rnorm(15)
+cor_methods <- c("pearson", "spearman", "kendall")
+traverse( cor(a, b, method = through(cor_methods)) )
 }

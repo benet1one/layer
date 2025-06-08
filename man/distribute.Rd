@@ -16,7 +16,7 @@ distribute(amount, between, dist = runif(between), digits = 0)
 \item{digits}{Digits of the values.}
 }
 \value{
-Numeric vector of length \code{between}, 
+Numeric vector of length \code{between},
 the values of which add up to \code{amount}.
 }
 \description{

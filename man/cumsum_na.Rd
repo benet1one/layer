@@ -18,7 +18,7 @@ cummin_na(x, remove = FALSE, replace = TRUE)
 \arguments{
 \item{x}{Numeric vector.}
 
-\item{remove}{Whether to remove NA values altogether. 
+\item{remove}{Whether to remove NA values altogether.
 The resulting vector will be of lesser or equal length to x.}
 
 \item{replace}{Whether to replace original NA values in the original vector

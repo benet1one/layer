@@ -18,7 +18,7 @@ does not reach the maximum.}
 
 \item{FUN}{function to be applied to each combination.}
 
-\item{simplify}{logical indicating if the result should be simplified 
+\item{simplify}{logical indicating if the result should be simplified
 to an array.}
 
 \item{...}{optionally, further arguments to \code{FUN}.}
@@ -31,5 +31,5 @@ a set number of combinations.
 combn_first(10, 4, first = 5)
 }
 \seealso{
-[utils::combn()]
+\code{\link[utils:combn]{utils::combn()}}
 }

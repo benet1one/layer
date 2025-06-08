@@ -5,20 +5,25 @@
 \alias{maximize}
 \title{Optimize a multi-variate function.}
 \usage{
-minimize(f, init, ...)
+minimize(f, init = NULL, lower, upper, ...)
 
-maximize(f, init, ...)
+maximize(f, init = NULL, lower, upper, ...)
 }
 \arguments{
 \item{f}{Function to optimise.}
 
 \item{init}{Initial values for the variable.}
 
-\item{...}{Arguments passed on to  \link[stats]{optim}.}
+\item{...}{Arguments passed on to \code{\link[stats:optimize]{stats::optimize()}} for univariate optimization
+or \code{\link[stats:optim]{stats::optim()}} for multivariate optimization.}
 }
 \value{
 List with the \code{solution} and \code{objective_value}.
 }
 \description{
 Optimize a multi-variate function.
+}
+\examples{
+minimize(~ (.x - 3)^2,  lower = -5, upper = +5)
+minimize(~ (.["a"] + 5)^2 + (.["b"] - 1)^2,  init = c(a=0, b=0))
 }

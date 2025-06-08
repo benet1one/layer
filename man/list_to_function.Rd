@@ -27,5 +27,5 @@ my_fun <- list_to_function(funs)
 my_fun(1:5)
 }
 \seealso{
-[function_list()]
+\code{\link[=function_list]{function_list()}}
 }
