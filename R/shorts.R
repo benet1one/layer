@@ -122,7 +122,19 @@ Num <- function(...) {
         as.numeric()
 }
 
-
+#' Create a vector with trailing arguments.
+#'
+#' @param ... Elements.
+#'
+#' @returns A vector
+#' @export
+#'
+#' @examples
+#' Vec(1, 2, 3,)
+#' c(1, 2, 3,)
+Vec <- function(...) {
+    unlist(rlang::list2(...))
+}
 
 #' Comfortable control flow inside the pipe
 #' @description
