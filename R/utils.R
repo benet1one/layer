@@ -189,37 +189,67 @@ combn_first <- function(x, m, first, warn = FALSE,
     out
 }
 
-combn_random <- function(x, m, amount, warn = FALSE, simplify = TRUE, ...) {
-    stopifnot(is_integerish(m, n = 1L), is_integerish(amount, n = 1L))
-    if (m < 0) 
-        stop("m < 0", domain = NA)
-    if (is_integerish(x, n = 1L)) 
-        x <- seq_len(x)
-    n <- length(x)
-    if (n < m) 
-        stop("n < m", domain = NA)
-    
-    
-}
-
-combn_recurse <- function(x, m) {
-    
-    n <- length(x)
-    if (n == 1L || m == 1L) return(t(x))
-    
-    mat <- matrix(nrow = m, ncol = choose(n, m))
-    k <- 1L
-    j <- 1L
-    
-    while (j <= ncol(mat)) {
-        recurse <- combn_recurse(x[-(1:k)], m-1L)
-        l <- j + ncol(recurse) - 1L
-        mat[1, j:l] <- x[k]
-        mat[2:nrow(mat), j:l] <- recurse
-        j <- l + 1L
-        k <- k + 1L
+#' Format hms.
+#'
+#' @param x `hms` object or numeric (in seconds).
+#' @param format String indicating the format. Maximum 3 characters:
+#' - H indicates hours.
+#' - M indicates minutes.
+#' - S indicates seconds.
+#' - h indicates hours, will be removed if time is under an hour.
+#' - m indicates minutes, will be removed if time is under a minute.
+#' @param digits Integer, number of digits to be included for the last value in `format`.
+#'
+#' @returns Character vector.
+#' @export
+format_hms <- function(x, format = "HMS", digits = 0) {
+    if (!valid_hms_format(format)) {
+        stop("invalid format")
     }
     
-    return(mat)
+    x <- as.numeric(x)
+    first <- substring(toupper(format), 1, 1)
+    
+    values_str <- values <- cbind(
+        H = x / 3600,
+        M = if (first == "M") (x / 60)  else (x %% 3600) / 60,
+        S = if (first == "S") (x)       else (x %% 60)
+    )
+
+    decimal <- if (digits > 0) {
+        last_value <- substring(toupper(format), nchar(format))
+        colnames(values) == last_value
+    } else {
+        rep(FALSE, nchar(format))
+    }
+    
+    values_str[, !decimal] <- floor(values[, !decimal]) |> 
+        formatC(width = 2, flag = "0")
+    values_str[, decimal] <- round(values[, decimal], digits) |> 
+        format(nsmall = digits, width = digits + 3) |> 
+        stringr::str_replace_all(" ", "0")
+    
+    if (stringr::str_detect(format, "m"))
+        values_str[x < 60, 1:2] <- ""
+    if (stringr::str_detect(format, "h"))
+        values_str[x < 3600, "H"] <- ""
+        
+    cols <- stringr::str_split_1(toupper(format), "")
+    out <- values_str[, cols, drop = FALSE] |> 
+        apply(1, paste, collapse = ":")
+    
+    stringr::str_remove(out, "^:+")
 }
 
+valid_hms_format <- function(format) {
+    if (length(format) != 1 ||
+        nchar(format) > 3L ||
+        stringr::str_detect(format, "[^HMShms]")) 
+        return(FALSE)
+    ch <- stringr::str_split_1(format, "")
+    if (anyDuplicated(ch) > 0L) 
+        return(FALSE)
+    if (any(ch != sort(ch)))
+        return(FALSE)
+    return(TRUE)
+}
