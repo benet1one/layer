@@ -5,7 +5,13 @@
 \title{Format a tempo object.
 with a flexible syntax.}
 \usage{
-\method{format}{tempo}(x, format = "\%H:\%M:\%S", digits = 0L, trim_zero = FALSE, ...)
+\method{format}{tempo}(
+  x,
+  format = "\%H:\%M:\%S",
+  digits = c(H = 0, M = 0, S = 0, h = 3, m = 3, s = 3),
+  trim_zero = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{A tempo object.}
@@ -28,13 +34,14 @@ with a flexible syntax.
 }
 \details{
 Argument \code{format} must be specified as follows:
-
-\code{\%H}  Hours. Can exceed 24.
-\code{\%M}  Clock Minutes. Can't exceed 60.
-\code{\%S}  Clock Seconds. Can't exceed 60.
-\code{\%h}  Hours with decimals. Can exceed 24.
-\code{\%m}  Total Minutes with decimals. Can exceed 60.
-\code{\%s}  Total Seconds with decimals. Can exceed 60.
+\itemize{
+\item \code{\%H} : Hours. Can exceed 24.
+\item \code{\%M} : Clock Minutes. Cannot exceed 60.
+\item \code{\%S} : Clock Seconds. Cannot exceed 60.
+\item \code{\%h} : Hours, with 3 decimals by default. Can exceed 24.
+\item \code{\%m} : Total Minutes. Can exceed 60.
+\item \code{\%s} : Total Seconds. Can exceed 60.
+}
 }
 \examples{
 
